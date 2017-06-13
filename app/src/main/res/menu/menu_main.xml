@@ -17,6 +17,12 @@
         app:showAsAction="never"
         android:title="Удалить отмеченные записи"></item>
     <item
+        android:id="@+id/action_goGroupVk"
+        android:orderInCategory="200"
+        android:icon="@drawable/icmenublack"
+        app:showAsAction="never"
+        android:title="Группа ВК"></item>
+    <item
         android:id="@+id/action_exitacc"
         android:orderInCategory="200"
         android:icon="@drawable/icmenublack"

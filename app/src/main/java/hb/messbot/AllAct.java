@@ -12,6 +12,7 @@ import android.content.res.ColorStateList;
 import android.content.res.ObbInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -45,7 +46,10 @@ import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiDialog;
 import com.vk.sdk.api.model.VKApiGetDialogResponse;
+import com.vk.sdk.api.model.VKApiGetMessagesResponse;
 import com.vk.sdk.api.model.VKList;
+import com.vk.sdk.api.model.VKUsersArray;
+import com.vk.sdk.util.VKUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -65,6 +69,9 @@ public class AllAct extends ActionBarActivity{
     public static final String APP_PREFERENCES = "switchCHECK";
     public  SharedPreferences switchcheck;
     public static final String app_switch = "switch";
+
+
+
 
     private Button btnAdd;
     private ImageButton btnClear;
@@ -144,7 +151,10 @@ public class AllAct extends ActionBarActivity{
         setSupportActionBar(toolbar);
 
 
-        
+        SharedPreferences.Editor editor = switchcheck.edit();
+        editor.putString("user_id", String.valueOf(getMyId()));
+        editor.apply();
+
         
 
 
@@ -234,14 +244,14 @@ public class AllAct extends ActionBarActivity{
             switchOnOff.setChecked(true);
             txtSwitch.setText("ON");
 
-            SharedPreferences.Editor editor = switchcheck.edit();
+            editor = switchcheck.edit();
             editor.putString(app_switch, "on");
             editor.apply();
         }else{
             switchOnOff.setChecked(false);
             txtSwitch.setText("OFF");
 
-            SharedPreferences.Editor editor = switchcheck.edit();
+            editor = switchcheck.edit();
             editor.putString(app_switch, "off");
             editor.apply();
         }
@@ -345,9 +355,9 @@ public class AllAct extends ActionBarActivity{
         while (cursor.moveToNext())
         {
             for(int i = 0; i<messes.size(); i++) {
-                if(checkSTR(messes.get(i), id.get(i), cursor.getString(cursor.getColumnIndex(DBHelper.TEXT_COLUMN)))==1 && switchcheck.getString(app_switch,"").equals("on")&& (getMyId() != id.get(i)))
+                if(checkSTR(messes.get(i), id.get(i), cursor.getString(cursor.getColumnIndex(DBHelper.TEXT_COLUMN)))==1 && switchcheck.getString(app_switch,"").equals("on")&& Integer.parseInt(switchcheck.getString("user_id","")) != id.get(i))
                 {
-                    if(!chats.get(i)) {
+
                         Log.d(getMyId() + "", id.get(i) + "");
                         VKRequest request = new VKRequest("messages.send", VKParameters.from(VKApiConst.USER_ID,
                                 id.get(i), VKApiConst.MESSAGE, cursor.getString(cursor.getColumnIndex(DBHelper.ANSWER_COLUMN))));
@@ -358,16 +368,6 @@ public class AllAct extends ActionBarActivity{
                                 Log.d("ANSWER", "УСПЕХ");
                             }
                         });
-                    }else{
-                        VKRequest request = new VKRequest("messages.send", VKParameters.from(VKApiConst.USER_ID,
-                                2000000000 + id.get(i), VKApiConst.MESSAGE, cursor.getString(cursor.getColumnIndex(DBHelper.ANSWER_COLUMN))));
-                        request.executeWithListener(new VKRequest.VKRequestListener() {
-                            @Override
-                            public void onComplete(VKResponse response) {
-                                super.onComplete(response);
-                                Log.d("ANSWER", "УСПЕХ");    }
-                        });
-                    }
                 }
 
             }
@@ -398,8 +398,7 @@ public class AllAct extends ActionBarActivity{
         @Override
         protected Void doInBackground(Void... params) {
             try {
-
-                VKRequest request = VKApi.messages().getDialogs(VKParameters.from(VKApiConst.COUNT, 20));
+                VKRequest request = VKApi.messages().getDialogs(VKParameters.from(VKApiConst.COUNT, 20,VKApiConst.UNREAD, true));
                 request.executeWithListener(new VKRequest.VKRequestListener() {
                     @Override
                     public void onComplete(final VKResponse response) {
@@ -410,44 +409,10 @@ public class AllAct extends ActionBarActivity{
                         VKApiGetDialogResponse vkApiGetMessagesResponse = (VKApiGetDialogResponse)response.parsedModel;
                         String kk = response.responseString;
                         VKList<VKApiDialog> list = vkApiGetMessagesResponse.items;
-                   /*     try {
-                            JSONObject jsonObject = new JSONObject(kk);
-                            jsonObject.getJSONObject("response");
-                            JSONObject jsonArray = jsonObject.getJSONObject("items");
-                            for(int i = 0; i<jsonObject.length(); i++){
-                                JSONObject object = jsonArray.getJSONObject(i);
-                                messes.add(object.getString("body"));
-                                //   id.add(msg.message.user_id);
-                                Log.d("title2", kk);
-                                if(Objects.equals(object.getString("title"), " ... "))
-                                {
-                                    chats.add(false);
-                                    id.add(object.getInt("user_id"));
-                                }else{
-                                    chats.add(true);
-                                    id.add(object.getInt("chat_id"));Log.d("title", object.getInt("chat_id")+"");
-                                }
 
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }*/
-
-                        for(VKApiDialog msg : list)
-                        {
+                        for(VKApiDialog msg : list){
                             messes.add(msg.message.body);
-                         //   id.add(msg.message.user_id);
-                                Log.d("title2", kk);
-                            if(Objects.equals(msg.message.title, " ... "))
-                            {
-                                chats.add(false);
-                                id.add(msg.message.user_id);
-                            }else{
-                                chats.add(true);
-                                id.add(msg.message.id);Log.d("title", msg.message.id+" " +msg.message.title);
-                            }
-                           // if(msg.message)
-
+                            id.add(msg.message.user_id);
                         }
                         algthBase(messes, id);
                     }
@@ -588,6 +553,9 @@ public class AllAct extends ActionBarActivity{
                 VKSdk.logout();
                 startActivity(new Intent(AllAct.this, MainActivity.class));
                 finish();
+                break;
+            case R.id.action_goGroupVk:
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://vk.com/ltc_omsk")));
                 break;
         }
         return super.onOptionsItemSelected(item);

@@ -3,6 +3,7 @@ package hb.messbot;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.widget.Button;
@@ -11,6 +12,7 @@ import android.widget.ListView;
 
 import com.vk.sdk.*;
 import com.vk.sdk.api.VKError;
+import com.vk.sdk.util.VKUtil;
 
 public class MainActivity extends Activity {
 
@@ -23,6 +25,11 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        String[] fingerprints = VKUtil.getCertificateFingerprint(this, this.getPackageName());
+        Log.d("Tag", fingerprints[0]);
+
+
         imgLogo = (ImageView) findViewById(R.id.imglogo);
         imgLogo.setImageResource(R.drawable.bg);
         Display display = getWindowManager().getDefaultDisplay();
