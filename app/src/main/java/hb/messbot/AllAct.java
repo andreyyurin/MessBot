@@ -102,7 +102,7 @@ public class AllAct extends ActionBarActivity{
     static boolean fr = false;
     private static TextView txtWelcome;
     private String txt2;
-    private static ArrayList<Boolean> chats;
+    public static ArrayList<Boolean> chats;
     public static String txt3;
     private static final int NOTIFY_ID = 101;
 
@@ -112,7 +112,7 @@ public class AllAct extends ActionBarActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.show_base);
 
-        MainProg();
+        //MainProg();
 
         switchcheck = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
 
@@ -256,7 +256,7 @@ public class AllAct extends ActionBarActivity{
             editor.apply();
         }
 
-
+        MainProg();
 
         switchOnOff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -324,9 +324,12 @@ public class AllAct extends ActionBarActivity{
                 }
             }
         });
-
-
-        MainProg();
+    }
+    @Override
+    protected void onStart(){
+        super.onStart();
+     //   Log.d("xyi","started Main conver");
+        startService(new Intent(this,MyService.class));
     }
     int checkSTR(final String str, int id, final String text)
     {
@@ -398,6 +401,7 @@ public class AllAct extends ActionBarActivity{
         @Override
         protected Void doInBackground(Void... params) {
             try {
+                //Log.d("xyi", "getDialogs");
                 VKRequest request = VKApi.messages().getDialogs(VKParameters.from(VKApiConst.COUNT, 20,VKApiConst.UNREAD, true));
                 request.executeWithListener(new VKRequest.VKRequestListener() {
                     @Override
@@ -570,20 +574,23 @@ public class AllAct extends ActionBarActivity{
     @Override
     protected void onResume() {
         super.onResume();
-        MainProg();
     }
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+    }
+
 
     @Override
     protected void onPause() {
         super.onPause();
-        MainProg();
+
+
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-
-        MainProg();
 
     }
 
