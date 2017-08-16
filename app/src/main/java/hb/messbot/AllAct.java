@@ -256,7 +256,8 @@ public class AllAct extends ActionBarActivity{
             editor.apply();
         }
 
-        MainProg();
+      //  MainProg();
+        startService(new Intent(this,MyService.class));
 
         switchOnOff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -329,7 +330,6 @@ public class AllAct extends ActionBarActivity{
     protected void onStart(){
         super.onStart();
      //   Log.d("xyi","started Main conver");
-        startService(new Intent(this,MyService.class));
     }
     int checkSTR(final String str, int id, final String text)
     {

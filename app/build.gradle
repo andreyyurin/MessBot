@@ -8,8 +8,8 @@ android {
         applicationId "hb.messbot"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 5
-        versionName "3"
+        versionCode 7
+        versionName "5"
     }
     buildTypes {
         release {

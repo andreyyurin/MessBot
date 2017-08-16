@@ -26,9 +26,6 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        String[] fingerprints = VKUtil.getCertificateFingerprint(this, this.getPackageName());
-        Log.d("Tag", fingerprints[0]);
-
 
         imgLogo = (ImageView) findViewById(R.id.imglogo);
         imgLogo.setImageResource(R.drawable.bg);
